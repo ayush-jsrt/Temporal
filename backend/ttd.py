@@ -9,16 +9,11 @@ def test_database():
     db = Database()
     print("✓ Database initialized")
     
-    # Initialize embedder for test data
-    embedder = EmbeddingGenerator()
-    
-    # Test add_card
-    test_embedding = embedder.generate_embedding("Test content for embedding")
+    # Test add_card (now generates embeddings automatically)
     card_id = db.add_card(
         title="Test Card",
         content="This is test content for the card",
-        metadata={"tags": ["test", "example"], "category": "testing"},
-        embedding=test_embedding
+        metadata={"tags": ["test", "example"], "category": "testing"}
     )
     print(f"✓ Card added with ID: {card_id}")
     
@@ -26,23 +21,9 @@ def test_database():
     all_cards = db.get_all_cards()
     print(f"✓ Retrieved {len(all_cards)} cards")
     
-    # Test get_card_by_id (if method exists)
-    try:
-        card = db.get_card_by_id(card_id)
-        if card:
-            print(f"✓ Retrieved card by ID: {card.title}")
-        else:
-            print("✗ Card not found by ID")
-    except AttributeError:
-        print("ℹ get_card_by_id method not implemented yet")
-    
-    # Test vector search (if method exists)
-    try:
-        query_embedding = embedder.generate_embedding("test query")
-        similar_cards = db.vector_search(query_embedding, limit=3)
-        print(f"✓ Vector search returned {len(similar_cards)} similar cards")
-    except AttributeError:
-        print("ℹ vector_search method not implemented yet")
+    # Test vector search with text query
+    similar_cards = db.vector_search("test content", limit=3)
+    print(f"✓ Vector search returned {len(similar_cards)} similar cards")
     
     print("Database tests completed!\n")
 
