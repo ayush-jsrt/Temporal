@@ -1,5 +1,5 @@
 from crud import Database
-from EmbeddingGenerator import EmbeddingGenerator
+from ai_service import AIService
 import json
 
 def test_database():
@@ -27,16 +27,16 @@ def test_database():
     
     print("Database tests completed!\n")
 
-def test_embedding_generator():
-    print("Testing EmbeddingGenerator class...")
+def test_ai_service():
+    print("Testing AIService class...")
     
-    # Initialize embedder
-    embedder = EmbeddingGenerator()
-    print("✓ EmbeddingGenerator initialized")
+    # Initialize AI service
+    ai_service = AIService()
+    print("✓ AIService initialized")
     
     # Test generate_embedding
     test_text = "This is a test sentence for embedding generation."
-    embedding = embedder.generate_embedding(test_text)
+    embedding = ai_service.generate_embedding(test_text)
     
     if embedding:
         print(f"✓ Generated embedding with {len(embedding)} dimensions")
@@ -44,25 +44,13 @@ def test_embedding_generator():
     else:
         print("✗ Failed to generate embedding")
     
-    # Test generate_card_embedding
-    card_embedding = embedder.generate_card_embedding(
-        "Sample Card Title",
-        "This is sample content for a card that we want to embed."
-    )
-    
-    if card_embedding:
-        print(f"✓ Generated card embedding with {len(card_embedding)} dimensions")
-        print(f"  First 5 values: {card_embedding[:5]}")
-    else:
-        print("✗ Failed to generate card embedding")
-    
-    print("EmbeddingGenerator tests completed!\n")
+    print("AIService tests completed!\n")
 
 if __name__ == "__main__":
     print("Running tests...\n")
     
     try:
-        test_embedding_generator()
+        test_ai_service()
         test_database()
         print("All tests completed!")
     except Exception as e:
