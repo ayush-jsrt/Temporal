@@ -210,5 +210,40 @@ def get_all_cards():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/cards/<int:card_id>', methods=['DELETE'])
+def delete_card(card_id):
+    try:
+        # Check if card exists first
+        card = temporal_api.db.get_card_by_id(card_id)
+        if not card:
+            return jsonify({
+                "success": False,
+                "error": f"Card with ID {card_id} not found"
+            }), 404
+        
+        # Delete the card
+        deleted = temporal_api.db.delete_card(card_id)
+        
+        if deleted:
+            return jsonify({
+                "success": True,
+                "message": f"Card {card_id} deleted successfully",
+                "deleted_card": {
+                    "id": card.id,
+                    "title": card.title
+                }
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": f"Failed to delete card with ID {card_id}"
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -55,22 +55,19 @@ def test_api():
     
     print("\n" + "="*50 + "\n")
     
-    # Test 2: Search for similar content
-    print("2. Testing search endpoint:")
-    search_data = {
-        "query": "data processing",
-        "limit": 3
-    }
-    
+    # Test 3: Get all cards
+    print("3. Testing get all cards endpoint:")
+    cards_before_delete = []
     try:
-        response = requests.post(f"{base_url}/search", json=search_data)
+        response = requests.get(f"{base_url}/cards")
         print(f"Status: {response.status_code}")
         result = response.json()
         
         if result.get('success'):
-            print(f"✓ Found {result['count']} similar cards")
-            for i, card in enumerate(result['results'][:2], 1):
-                print(f"  {i}. {card['title']}: {card['content'][:50]}...")
+            cards_before_delete = result['cards']
+            print(f"✓ Retrieved {result['count']} total cards")
+            for i, card in enumerate(result['cards'][:3], 1):
+                print(f"  {i}. ID:{card['id']} {card['title']}: {card['content'][:50]}...")
         else:
             print(f"✗ Error: {result.get('error')}")
     except Exception as e:
@@ -78,21 +75,54 @@ def test_api():
     
     print("\n" + "="*50 + "\n")
     
-    # Test 3: Get all cards
-    print("3. Testing get all cards endpoint:")
-    try:
-        response = requests.get(f"{base_url}/cards")
-        print(f"Status: {response.status_code}")
-        result = response.json()
+    # Test 4: Delete a card (if any cards exist)
+    print("4. Testing delete card endpoint:")
+    if cards_before_delete:
+        card_to_delete = cards_before_delete[0]  # Delete the first card
+        card_id = card_to_delete['id']
         
-        if result.get('success'):
-            print(f"✓ Retrieved {result['count']} total cards")
-            for i, card in enumerate(result['cards'][:3], 1):
-                print(f"  {i}. {card['title']}: {card['content'][:50]}...")
-        else:
-            print(f"✗ Error: {result.get('error')}")
-    except Exception as e:
-        print(f"✗ Request failed: {e}")
+        try:
+            response = requests.delete(f"{base_url}/cards/{card_id}")
+            print(f"Status: {response.status_code}")
+            result = response.json()
+            
+            if result.get('success'):
+                print(f"✓ Successfully deleted card ID: {card_id}")
+                print(f"✓ Deleted card title: {result['deleted_card']['title']}")
+                
+                # Verify deletion by getting all cards again
+                verify_response = requests.get(f"{base_url}/cards")
+                if verify_response.status_code == 200:
+                    verify_result = verify_response.json()
+                    if verify_result.get('success'):
+                        new_count = verify_result['count']
+                        old_count = len(cards_before_delete)
+                        if new_count == old_count - 1:
+                            print(f"✓ Confirmed deletion: card count reduced from {old_count} to {new_count}")
+                        else:
+                            print(f"✗ Card count mismatch: expected {old_count - 1}, got {new_count}")
+            else:
+                print(f"✗ Error: {result.get('error')}")
+        except Exception as e:
+            print(f"✗ Request failed: {e}")
+        
+        print("\n" + "-"*30 + "\n")
+        
+        # Test 4b: Try to delete non-existent card
+        print("4b. Testing delete non-existent card:")
+        try:
+            response = requests.delete(f"{base_url}/cards/99999")
+            print(f"Status: {response.status_code}")
+            result = response.json()
+            
+            if response.status_code == 404 and not result.get('success'):
+                print(f"✓ Correctly handled non-existent card: {result['error']}")
+            else:
+                print(f"✗ Unexpected response for non-existent card")
+        except Exception as e:
+            print(f"✗ Request failed: {e}")
+    else:
+        print("No cards available to delete. Create some cards first.")
 
 if __name__ == "__main__":
     print("Make sure the API server is running first:")

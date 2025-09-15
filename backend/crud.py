@@ -46,3 +46,22 @@ class Database:
             ).limit(limit).all()
         finally:
             session.close()
+
+    def delete_card(self, card_id):
+        session = self.Session()
+        try:
+            card = session.query(Card).filter(Card.id == card_id).first()
+            if card:
+                session.delete(card)
+                session.commit()
+                return True
+            return False
+        finally:
+            session.close()
+
+    def get_card_by_id(self, card_id):
+        session = self.Session()
+        try:
+            return session.query(Card).filter(Card.id == card_id).first()
+        finally:
+            session.close()
