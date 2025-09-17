@@ -80,6 +80,7 @@ class ConversationalWorkflow:
     def load_session_node(self, state: ConversationState) -> ConversationState:
         """Load session context and focused card from Redis"""
         session_id = state.get("session_id")
+        focused_card_from_request = state.get("focused_card")  # From process_message parameter
         
         if not self.use_redis or not session_id:
             # Create new session if none provided
@@ -87,6 +88,11 @@ class ConversationalWorkflow:
                 new_session_id = self.state_manager.create_new_session()
                 state["session_id"] = new_session_id
                 print(f"Created new session: {new_session_id[:8]}...")
+                
+                # If focused card was provided in request, save it to the new session
+                if focused_card_from_request:
+                    self.state_manager.save_focused_card(new_session_id, focused_card_from_request)
+                    print(f"✓ Set focused card for new session: {focused_card_from_request.get('title', 'Untitled')}")
             return state
         
         print(f"Loading session: {session_id[:8]}...")
@@ -95,15 +101,22 @@ class ConversationalWorkflow:
         previous_state = self.state_manager.load_conversation_state(session_id)
         if previous_state:
             print(f"✓ Loaded previous conversation state")
-            # Merge relevant fields from previous state
-            if "focused_card" in previous_state:
+            # Merge relevant fields from previous state, but don't override focused_card from request
+            if "focused_card" in previous_state and not focused_card_from_request:
                 state["focused_card"] = previous_state["focused_card"]
         
-        # Load focused card
-        focused_card = self.state_manager.load_focused_card(session_id)
-        if focused_card:
-            state["focused_card"] = focused_card
-            print(f"✓ Loaded focused card: {focused_card.get('title', 'Untitled')}")
+        # Load focused card from Redis (unless we have one from the request)
+        if not focused_card_from_request:
+            focused_card = self.state_manager.load_focused_card(session_id)
+            if focused_card:
+                state["focused_card"] = focused_card
+                print(f"✓ Loaded focused card from Redis: {focused_card.get('title', 'Untitled')}")
+            else:
+                print("⚠ No focused card found in session")
+        else:
+            # Update Redis with the focused card from the request
+            self.state_manager.save_focused_card(session_id, focused_card_from_request)
+            print(f"✓ Updated focused card from request: {focused_card_from_request.get('title', 'Untitled')}")
         
         # Update session activity
         self.state_manager.update_session_activity(session_id)
@@ -440,7 +453,23 @@ Keep it concise and positive."""
         
         # Different response styles based on intent
         elif intent == "NO_ACTION":
-            prompt = f"""You are a helpful AI assistant. The user asked: "{user_message}"
+            focused_card = state.get("focused_card")
+            if focused_card:
+                print(f"🎯 Using focused card context: {focused_card.get('title', 'Untitled')}")
+                # User is asking about information with a focused card context
+                prompt = f"""You are a helpful AI assistant. The user asked: "{user_message}"
+
+The user is currently viewing this knowledge card:
+Title: {focused_card.get('title', 'Untitled')}
+Content: {focused_card.get('content', 'No content')[:500]}...
+
+This appears to be an informational question. If their question relates to the focused card, use that context to provide a more relevant response. If it's unrelated, provide a general helpful response.
+
+Keep it concise and informative."""
+            else:
+                print("ℹ️ No focused card context available")
+                # Standard informational response without card context
+                prompt = f"""You are a helpful AI assistant. The user asked: "{user_message}"
 
 This appears to be an informational question. Provide a helpful, conversational response.
 Keep it concise and informative."""
@@ -479,7 +508,7 @@ Keep it conversational and concise."""
         
         return state
     
-    def process_message(self, user_message: str, session_id: Optional[str] = None) -> dict:
+    def process_message(self, user_message: str, session_id: Optional[str] = None, focused_card: Optional[dict] = None) -> dict:
         """Process a user message through the workflow with session management"""
         initial_state = {
             "user_message": user_message,
@@ -490,12 +519,14 @@ Keep it conversational and concise."""
             "response": None,
             "card_id": None,
             "updated_card": None,
-            "focused_card": None
+            "focused_card": focused_card  # Set focused card from parameter
         }
         
         print(f"\n=== Processing: '{user_message}' ===")
         if session_id:
             print(f"Session: {session_id[:8]}...")
+        if focused_card:
+            print(f"Focused card: {focused_card.get('title', 'Untitled')}")
         
         # Run the workflow
         final_state = self.graph.invoke(initial_state)
