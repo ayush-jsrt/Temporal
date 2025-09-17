@@ -1,0 +1,10 @@
+flask
+flask-cors
+boto3
+requests
+redis
+langgraph
+langchain
+langchain-anthropic
+pydantic
+typing-extensions

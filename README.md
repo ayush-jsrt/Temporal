@@ -8,12 +8,20 @@ A personal knowledge management system powered by AI that transforms your though
 Start the PostgreSQL database with pgvector extension:
 
 ```bash
-docker run --name temporal-db \
+docker run -d --name temporal-db \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=root \
   -e POSTGRES_DB=temporal_db \
   -p 5432:5432 \
   ankane/pgvector
+```
+
+Start Redis for conversation state management:
+
+```bash
+docker run -d --name temporal-redis \
+  -p 6379:6379 \
+  redis:7-alpine
 ```
 
 ### 2. Backend Setup
