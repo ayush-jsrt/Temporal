@@ -245,5 +245,55 @@ def delete_card(card_id):
             "error": str(e)
         }), 500
 
+@app.route('/cards/<int:card_id>', methods=['PUT'])
+def update_card(card_id):
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                "success": False,
+                "error": "No data provided"
+            }), 400
+        
+        # Extract update fields
+        title = data.get('title')
+        content = data.get('content')
+        metadata = data.get('metadata')
+        
+        # At least one field must be provided
+        if title is None and content is None and metadata is None:
+            return jsonify({
+                "success": False,
+                "error": "At least one field (title, content, or metadata) must be provided"
+            }), 400
+        
+        # Update the card
+        updated_card = temporal_api.db.update_card(card_id, title=title, content=content, metadata=metadata)
+        
+        if updated_card:
+            return jsonify({
+                "success": True,
+                "message": f"Card {card_id} updated successfully",
+                "updated_card": {
+                    "id": updated_card.id,
+                    "title": updated_card.title,
+                    "content": updated_card.content,
+                    "metadata": updated_card.card_metadata,
+                    "created_at": updated_card.created_at.isoformat()
+                }
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": f"Card with ID {card_id} not found"
+            }), 404
+            
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -55,6 +55,72 @@ def test_database():
     
     print("Database tests completed!\n")
 
+def test_update_card():
+    print("Testing update_card functionality...")
+    
+    # Initialize database
+    db = Database()
+    
+    # First create a test card
+    card_id = db.add_card(
+        title="Original Test Card",
+        content="This is the original content for testing updates",
+        metadata={"version": 1, "test": True}
+    )
+    print(f"✓ Created test card with ID: {card_id}")
+    
+    # Test 1: Update title only
+    updated_card = db.update_card(card_id, title="Updated Test Card")
+    if updated_card and updated_card.title == "Updated Test Card":
+        print("✓ Title update successful")
+    else:
+        print("✗ Title update failed")
+    
+    # Test 2: Update content only (should regenerate embedding)
+    new_content = "This is completely new content that should generate a new embedding"
+    updated_card = db.update_card(card_id, content=new_content)
+    if updated_card and updated_card.content == new_content:
+        print("✓ Content update successful")
+        print("✓ Embedding should be regenerated")
+    else:
+        print("✗ Content update failed")
+    
+    # Test 3: Update metadata only
+    new_metadata = {"version": 2, "test": True, "updated": True}
+    updated_card = db.update_card(card_id, metadata=new_metadata)
+    if updated_card and updated_card.card_metadata == new_metadata:
+        print("✓ Metadata update successful")
+    else:
+        print("✗ Metadata update failed")
+    
+    # Test 4: Update all fields at once
+    updated_card = db.update_card(
+        card_id,
+        title="Fully Updated Card",
+        content="Completely new content for all fields update test",
+        metadata={"version": 3, "fully_updated": True}
+    )
+    if (updated_card and 
+        updated_card.title == "Fully Updated Card" and 
+        "all fields update" in updated_card.content and
+        updated_card.card_metadata["version"] == 3):
+        print("✓ All fields update successful")
+    else:
+        print("✗ All fields update failed")
+    
+    # Test 5: Update non-existent card
+    non_existent_update = db.update_card(99999, title="Should fail")
+    if non_existent_update is None:
+        print("✓ Correctly handled update of non-existent card")
+    else:
+        print("✗ Should return None for non-existent card")
+    
+    # Cleanup
+    db.delete_card(card_id)
+    print("✓ Test card cleaned up")
+    
+    print("Update card tests completed!\n")
+
 def test_ai_service():
     print("Testing AIService class...")
     
@@ -80,6 +146,7 @@ if __name__ == "__main__":
     try:
         test_ai_service()
         test_database()
+        test_update_card()
         print("All tests completed!")
     except Exception as e:
         print(f"Error during testing: {e}")

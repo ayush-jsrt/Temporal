@@ -65,3 +65,40 @@ class Database:
             return session.query(Card).filter(Card.id == card_id).first()
         finally:
             session.close()
+
+    def update_card(self, card_id, title=None, content=None, metadata=None):
+        """Update a card's title, content, and/or metadata. Updates embedding if content changes."""
+        session = self.Session()
+        try:
+            card = session.query(Card).filter(Card.id == card_id).first()
+            if not card:
+                return None
+            
+            # Update fields if provided
+            if title is not None:
+                card.title = title
+            if content is not None:
+                card.content = content
+                # Generate new embedding when content changes
+                card.embedding = self.ai_service.generate_embedding(content)
+            if metadata is not None:
+                card.card_metadata = metadata
+            
+            session.commit()
+            
+            # Refresh the object to get latest data and make it accessible after session close
+            session.refresh(card)
+            
+            # Create a detached copy with all the data we need
+            updated_card = Card(
+                title=card.title,
+                content=card.content,
+                card_metadata=card.card_metadata,
+                embedding=card.embedding
+            )
+            updated_card.id = card.id
+            updated_card.created_at = card.created_at
+            
+            return updated_card
+        finally:
+            session.close()

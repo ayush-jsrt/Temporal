@@ -124,6 +124,88 @@ def test_api():
     else:
         print("No cards available to delete. Create some cards first.")
 
+    print("\n" + "="*50 + "\n")
+
+    # Test 5: Update card endpoint
+    print("5. Testing update card endpoint:")
+    # Get current cards to find one to update
+    try:
+        response = requests.get(f"{base_url}/cards")
+        if response.status_code == 200 and response.json().get('success'):
+            current_cards = response.json()['cards']
+            if current_cards:
+                card_to_update = current_cards[0]
+                card_id = card_to_update['id']
+                original_title = card_to_update['title']
+                
+                print(f"Updating card ID: {card_id}")
+                print(f"Original title: {original_title}")
+                
+                # Test 5a: Update title only
+                print("\n5a. Testing title-only update:")
+                update_data = {
+                    "title": f"Updated: {original_title}"
+                }
+                
+                response = requests.put(f"{base_url}/cards/{card_id}", json=update_data)
+                print(f"Status: {response.status_code}")
+                result = response.json()
+                
+                if result.get('success'):
+                    print(f"✓ Title updated successfully")
+                    print(f"✓ New title: {result['updated_card']['title']}")
+                else:
+                    print(f"✗ Update failed: {result.get('error')}")
+                
+                # Test 5b: Update content and metadata
+                print("\n5b. Testing content and metadata update:")
+                update_data = {
+                    "content": "<h3 class='card-heading'>Updated Knowledge Card</h3><p class='card-description'>This card has been updated via API test.</p>",
+                    "metadata": {
+                        "updated_by": "api_test",
+                        "test_timestamp": "2025-09-17",
+                        "version": "2.0"
+                    }
+                }
+                
+                response = requests.put(f"{base_url}/cards/{card_id}", json=update_data)
+                print(f"Status: {response.status_code}")
+                result = response.json()
+                
+                if result.get('success'):
+                    print(f"✓ Content and metadata updated successfully")
+                    print(f"✓ Updated metadata: {result['updated_card']['metadata']}")
+                    print(f"✓ Content length: {len(result['updated_card']['content'])}")
+                else:
+                    print(f"✗ Update failed: {result.get('error')}")
+                
+                # Test 5c: Update non-existent card
+                print("\n5c. Testing update of non-existent card:")
+                response = requests.put(f"{base_url}/cards/99999", json={"title": "This should fail"})
+                print(f"Status: {response.status_code}")
+                
+                if response.status_code == 404:
+                    print(f"✓ Correctly returned 404 for non-existent card")
+                else:
+                    print(f"✗ Expected 404, got {response.status_code}")
+                
+                # Test 5d: Update with empty data
+                print("\n5d. Testing update with no data:")
+                response = requests.put(f"{base_url}/cards/{card_id}", json={})
+                print(f"Status: {response.status_code}")
+                
+                if response.status_code == 400:
+                    print(f"✓ Correctly returned 400 for empty update data")
+                else:
+                    print(f"✗ Expected 400, got {response.status_code}")
+                    
+            else:
+                print("No cards available to update. Create some cards first.")
+        else:
+            print("Could not retrieve cards for update test")
+    except Exception as e:
+        print(f"✗ Update test failed: {e}")
+
 if __name__ == "__main__":
     print("Make sure the API server is running first:")
     print("python backend/api.py")
