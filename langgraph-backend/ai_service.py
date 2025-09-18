@@ -4,7 +4,7 @@ import json
 class AIService:
     def __init__(self, region_name="us-east-1"):
         self.client = boto3.client("bedrock-runtime", region_name=region_name)
-        self.llm_model = "anthropic.claude-3-sonnet-20240229-v1:0"
+        self.llm_model = "anthropic.claude-3-haiku-20240307-v1:0"
     
     def _invoke_model(self, model_id: str, payload: dict) -> dict:
         """Core method to invoke any Bedrock model"""
