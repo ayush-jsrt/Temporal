@@ -1,9 +1,15 @@
 import boto3
 import json
+import os
 
 class AIService:
     def __init__(self, region_name="us-east-1"):
-        self.client = boto3.client("bedrock-runtime", region_name=region_name)
+        self.client = boto3.client(
+            "bedrock-runtime",
+            region_name=region_name,
+            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+        )
         self.llm_model = "anthropic.claude-3-haiku-20240307-v1:0"
     
     def _invoke_model(self, model_id: str, payload: dict) -> dict:
@@ -22,10 +28,7 @@ class AIService:
             "anthropic_version": "bedrock-2023-05-31",
             "max_tokens": max_tokens,
             "messages": [
-                {
-                    "role": "user",
-                    "content": prompt
-                }
+                {"role": "user", "content": prompt}
             ]
         }
         response = self._invoke_model(self.llm_model, payload)
