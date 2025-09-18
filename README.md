@@ -29,8 +29,7 @@ Create aws credentials in the cluster:
 ```bash
 kubectl create secret generic aws-credentials \
   --from-literal=aws-access-key=YOUR_AWS_ACCESS_KEY_ID \
-  --from-literal=aws-secret-key=YOUR_AWS_SECRET_ACCESS_KEY \
-  -n code-analyzer
+  --from-literal=aws-secret-key=YOUR_AWS_SECRET_ACCESS_KEY
 ```
 
 ### 2. Backend Setup
