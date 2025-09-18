@@ -167,9 +167,9 @@ const App = () => {
           title: focusedCard.title,
           content: focusedCard.content.substring(0, 500) // Limit content size
         }
-        console.log(`🎯 Sending focused card context: ${focusedCard.title}`)
+        console.log(`Sending focused card context: ${focusedCard.title}`)
       } else {
-        console.log(`ℹ️ No focused card context available`)
+        console.log(`No focused card context available`)
       }
 
       const response = await axios.post(`${LANGGRAPH_API_URL}/chat`, requestPayload)
@@ -232,7 +232,7 @@ const App = () => {
     if (!sessionId || !aiStatus?.redis_enabled) return
 
     try {
-      console.log(`🎯 Setting focused card in AI: ${card.title}`)
+      console.log(`Setting focused card in AI: ${card.title}`)
       await axios.post(`${LANGGRAPH_API_URL}/sessions/${sessionId}/focused-card`, {
         card: {
           id: card.id,
@@ -240,9 +240,9 @@ const App = () => {
           content: card.content.substring(0, 500) // Limit content size
         }
       })
-      console.log(`✅ Focused card set successfully`)
+      console.log(`Focused card set successfully`)
     } catch (err) {
-      console.warn('❌ Failed to update AI focused card:', err.message)
+      console.warn('Failed to update AI focused card:', err.message)
     }
   }
 

@@ -9,6 +9,6 @@ export default defineConfig({
   },
   root: './react',
   build: {
-    outDir: '../dist/react'
+    outDir: '../dist/'
   }
 })

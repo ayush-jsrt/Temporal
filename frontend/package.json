@@ -6,19 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "dev:react": "vite --config vite.config.react.js",
-    "dev:vue": "vite --config vite.config.vue.js"
+    "preview": "vite preview"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "vue": "^3.3.4",
     "axios": "^1.5.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
-    "@vitejs/plugin-vue": "^4.2.3",
     "vite": "^4.4.0"
   }
 }
