@@ -19,7 +19,7 @@ class ConversationState(TypedDict):
     focused_card: Optional[dict]
 
 class ConversationalWorkflow:
-    def __init__(self, backend_url="http://backend-service:5000", use_redis=True):
+    def __init__(self, backend_url="http://backend-service:5000", use_redis=True, redis_host="langgraph-db-service", redis_port=6379):
         self.ai_service = AIService()
         self.backend_url = backend_url
         self.use_redis = use_redis
@@ -28,8 +28,8 @@ class ConversationalWorkflow:
         self.state_manager = None
         if use_redis:
             try:
-                self.state_manager = create_database_manager()
-                print("✓ Redis state management enabled")
+                self.state_manager = create_database_manager(host=redis_host, port=redis_port)
+                print(f"✓ Redis state management enabled on {redis_host}:{redis_port}")
             except Exception as e:
                 print(f"⚠ Redis unavailable, using in-memory state: {e}")
                 self.use_redis = False
