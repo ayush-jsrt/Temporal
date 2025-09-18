@@ -4,7 +4,7 @@ from typing import Optional, Dict, List, Any
 from datetime import datetime, timedelta
 
 class RedisManager:
-    def __init__(self, host="localhost", port=6379, db=0, decode_responses=True):
+    def __init__(self, host="langgraph-service", port=6379, db=0, decode_responses=True):
         """Initialize Redis connection"""
         self.host = host
         self.port = port
