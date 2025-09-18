@@ -24,6 +24,15 @@ docker run -d --name temporal-redis \
   redis:7-alpine
 ```
 
+Create aws credentials in the cluster:
+
+```bash
+kubectl create secret generic aws-credentials \
+  --from-literal=aws-access-key=YOUR_AWS_ACCESS_KEY_ID \
+  --from-literal=aws-secret-key=YOUR_AWS_SECRET_ACCESS_KEY \
+  -n code-analyzer
+```
+
 ### 2. Backend Setup
 ```bash
 cd backend

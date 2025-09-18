@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-db
+  labels:
+    app: backend-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-db
+  template:
+    metadata:
+      labels:
+        app: backend-db
+    spec:
+      containers:
+        - name: backend-db
+          image: ankane/pgvector
+          ports:
+            - containerPort: 5432
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws-access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws-secret-key
