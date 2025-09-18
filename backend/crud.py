@@ -4,7 +4,7 @@ from cards import Base, Card
 from ai_service import AIService
 
 class Database:
-    def __init__(self, url="postgresql+psycopg2://postgres:root@localhost:5432/temporal_db"):
+    def __init__(self, url="postgresql+psycopg2://postgres:root@backend-db-service:5432/temporal_db"):
         self.engine = create_engine(url)
         self.Session = sessionmaker(bind=self.engine)
         self.ai_service = AIService()
