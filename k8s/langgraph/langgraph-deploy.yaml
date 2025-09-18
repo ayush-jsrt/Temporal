@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: langgraph
+  labels:
+    app: langgraph
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: langgraph
+  template:
+    metadata: 
+      labels:
+        app: langgraph
+    spec:
+      containers:
+        - name: langgraph
+          image: ayushjsrtia/temporal-langgraph:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws-access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: aws-secret-key

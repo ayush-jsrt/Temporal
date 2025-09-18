@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: langgraph-db
+  labels:
+    app: langgraph-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: langgraph-db
+  template:
+    metadata:
+      labels:
+        app: langgraph-db
+    spec:
+      containers:
+        - name: langgraph-db
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
