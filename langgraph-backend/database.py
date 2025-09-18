@@ -196,7 +196,7 @@ class ConversationStateManager:
             return []
 
 # Convenience function to create a database instance
-def create_database_manager(host="localhost", port=6379, db=0) -> ConversationStateManager:
+def create_database_manager(host="langraph-db-service", port=6379, db=0) -> ConversationStateManager:
     """Create a conversation state manager with Redis backend"""
     redis_manager = RedisManager(host=host, port=port, db=db)
     return ConversationStateManager(redis_manager)

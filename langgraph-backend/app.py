@@ -19,7 +19,7 @@ class ConversationState(TypedDict):
     focused_card: Optional[dict]
 
 class ConversationalWorkflow:
-    def __init__(self, backend_url="http://localhost:5000", use_redis=True):
+    def __init__(self, backend_url="http://backend-service:5000", use_redis=True):
         self.ai_service = AIService()
         self.backend_url = backend_url
         self.use_redis = use_redis
