@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:5000'
-const LANGGRAPH_API_URL = 'http://localhost:8000'
+const API_BASE_URL = '/backend/'
+const LANGGRAPH_API_URL = '/langgraph/'
 
 const App = () => {
   const [cards, setCards] = useState([])

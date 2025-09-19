@@ -2,8 +2,8 @@
  * API Service for handling backend communications
  */
 
-const API_BASE_URL = 'https://redesigned-system-xj766xv9vvv3vp66-5000.app.github.dev/'
-const LANGGRAPH_API_URL = 'http://localhost:8000'
+const API_BASE_URL = '/backend/'
+const LANGGRAPH_API_URL = '/langgraph/'
 
 class ApiService {
   // Main Backend API (Port 5000)
